@@ -1,13 +1,18 @@
 use std::f32::consts::PI;
 
 use rkit::{
-    draw::create_draw_2d,
+    draw::{BaseCam2D, create_draw_2d},
     gfx::{self, Color},
     math::{Vec2, vec2},
     prelude::*,
 };
 
-use crate::AppScreen;
+use crate::{
+    AppScreen,
+    cam::{Cam, UICam},
+    consts::palette,
+    postfx::rtf,
+};
 
 pub fn load_plugin(app: &mut App) {
     app.on_screen_schedule(AppScreen::Load, OnRender, draw_system)
@@ -21,9 +26,10 @@ fn update_system(mut cmds: Commands, mouse: Res<Mouse>) {
     }
 }
 
-fn draw_system(win: Res<Window>, time: Res<Time>) {
+fn draw_system(cam: Single<&Cam, With<UICam>>, win: Res<Window>, time: Res<Time>) {
     let mut draw = create_draw_2d();
-    draw.clear(Color::BLACK);
+    draw.clear(palette::BLACK);
+    draw.set_camera(&cam.inner);
 
     let elapsed = time.elapsed_f32();
 
@@ -38,12 +44,14 @@ fn draw_system(win: Res<Window>, time: Res<Time>) {
     let alpha = alpha_min + (alpha_max - alpha_min) * (0.5 + 0.5 * fade.sin());
     let offset_y = 10.0 * movement.sin();
 
+    let pos = cam.resolution() * 0.5 + vec2(0.0, offset_y);
     draw.text("Click to start")
-        .size(20.0)
+        .color(palette::WHITE)
+        .size(40.0)
         .alpha(alpha)
-        .translate(win.size() * 0.5 + vec2(0.0, offset_y))
+        .translate(pos)
         .origin(Vec2::splat(0.5))
         .h_align_center();
 
-    gfx::render_to_frame(&draw).unwrap();
+    rtf(&draw).unwrap();
 }

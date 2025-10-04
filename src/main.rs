@@ -1,14 +1,28 @@
+mod anims;
+mod assets;
+mod cam;
 mod consts;
 mod game;
 mod load;
 mod menu;
+mod misc;
 mod postfx;
+mod tweens;
 
 use rkit::prelude::*;
 
-use crate::{game::game_plugin, load::load_plugin, menu::menu_plugin};
+use crate::{
+    anims::anims_plugin, assets::assets_plugin, cam::camera_plugin, game::game_plugin,
+    load::load_plugin, menu::menu_plugin, misc::misc_plugin, postfx::postfx_plugin,
+    tweens::tweens_plugin,
+};
 
 pub fn main() -> Result<(), String> {
+    let init_screen = if cfg!(debug_assertions) {
+        AppScreen::Load
+    } else {
+        AppScreen::Load
+    };
     App::new()
         // framework
         .add_plugin(MainPlugins::default())
@@ -16,10 +30,16 @@ pub fn main() -> Result<(), String> {
         .add_plugin(window_plugin())
         .add_plugin(logging_plugin())
         // game
-        .add_screen(AppScreen::Load)
+        .add_screen(init_screen)
+        .add_plugin(camera_plugin)
+        .add_plugin(assets_plugin)
+        .add_plugin(misc_plugin)
         .add_plugin(load_plugin)
         .add_plugin(menu_plugin)
         .add_plugin(game_plugin)
+        .add_plugin(postfx_plugin)
+        .add_plugin(tweens_plugin)
+        .add_plugin(anims_plugin)
         .run()
 }
 

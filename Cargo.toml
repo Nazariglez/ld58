@@ -20,6 +20,9 @@ opt-level = 1
 opt-level = 3
 
 [dependencies]
+log = "0.4"
+strum = "0.27.1"
+strum_macros = "0.27.1"
 
 [dependencies.rkit]
 git = "https://github.com/Nazariglez/rkit.git"
